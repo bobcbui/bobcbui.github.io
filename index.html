@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-CN" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>编程导航</title>
-	<meta name="Description" Content="程序员收藏着一些有用的东西，常用网站导航页面。">
+    <title>堂堂程序员</title>
+	<meta name="Description" Content="堂堂程序员是国内最不知名的一个个人博客网站，内容最不丰富的网站，只包括，Java,Python，前端，数据库,游戏，漫画，社会，经济，兼容。">
     <meta charset="utf-8">
-    <meta name="baidu-site-verification" content="YDXgQyTaZv" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="shortcut icon" href="https://avatars0.githubusercontent.com/u/38550226?s=40&u=f1f8ae9fc00eeff54377fe0617c0335a92fad690&v=4" >
 	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-	<link href="https://cdn.bootcss.com/github-markdown-css/3.0.1/github-markdown.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <style type="text/css">
         body,html,#app{
@@ -61,18 +57,24 @@
 				&nbsp;
 			</el-col>
 			<el-col :span="20" :xs="22">
-				<el-tabs v-model="activeName">
-					<el-tab-pane label="导航" name="first">
-						<el-row :gutter="20" >
-							<el-col :lg="4" :md="6" :sm="6" :xs="12" v-for="item in collect" :key="item.title" class="collect-item" >
-								<el-button plain v-text="item.title" style="width:100%" @click.native="clickTitle(item.link)"></el-button>
+				<el-tabs v-model="activeName" @tab-click="handleClick">
+					<el-tab-pane label="堂堂程序员" name="home"></el-tab-pane>
+					<el-tab-pane label="分类" name="class" @click="qh(blog.blogClass)">
+						<el-tag v-for="(item,index) in blog.blogClass" :key="index" v-text="item + '(' + index + ')'" style="margin: 0 3px 6px 3px;" @click="onTag(item)"></el-tag>
+					</el-tab-pane>
+					<el-tab-pane label="标签"  name="tag" v-on:click="qh(blog.blogTags)">
+						<el-tag v-for="(item,index) in blog.blogTags" :key="index" v-text="item + '(' + index + ')'" style="margin: 0 3px 6px 3px;" @click="onTag(item)"></el-tag>
+					</el-tab-pane>
+					<el-tab-pane v-for="(item,index) in thisTag" :key="index" :name="item" :label="item">
+						<el-row :gutter="20">
+							<el-col :sm="24" :md="12" :lg="12" v-for="(item,index) in thisBlogs" :key="index">
+								<div style="background-color: antiquewhite;padding: 5px;border-radius: 3px; margin-bottom: 15px;">
+									<h3 style="margin: 0px;"><a :href="item.blog.url" v-text="item.blog.title"></a></h3>
+									<span v-text="item.blogClass"></span>.<span v-for="(item,index) in item.blogTag" v-text="item" :key="index"></span>
+								</div>
 							</el-col>
 						</el-row>
 					</el-tab-pane>
-					<el-tab-pane class="markdown-body" label="后端" v-html="hdHtml" name="hd"></el-tab-pane>
-					<el-tab-pane class="markdown-body" label="前端" v-html="qdHtml" name="qd"></el-tab-pane>
-					<el-tab-pane class="markdown-body" label="工具" v-html="gjHtml" name="gj"></el-tab-pane>
-					<el-tab-pane class="markdown-body" label="关于" v-html="gyHtml" name="gy"></el-tab-pane>
 				</el-tabs>
 			</el-col>
 			<el-col :span="2" :xs="1">
@@ -83,124 +85,75 @@
 </body>
 <script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-<script src="https://www.jnnvc.com/lib/marked.js"></script>
 <script src="https://unpkg.com/jquery@3.4.0/dist/jquery.min.js"></script>
 <script>	
 	let v = new Vue({
         el: '#app',
-        data: function () {
+        data() {
             return {
 				activeName:"first",
-				gyHtml:"",
-		    		hdHtml:"",
-		    		qdHtml:"",
-		    		gjHtml:"",
-				collect:[
-					{
-						"title":"百度",
-						"link":"https://www.baidu.com"
-					},
-					{
-						"title": "CSDN",
-						"link": "https://www.csdn.net/"
-					},
-					{
-						"title": "GitHub",
-						"link": "https://github.com"
-					},
-					{
-						"title": "菜鸟教程",
-						"link": "https://www.runoob.com"
-					},
-					{
-						"title": "博客园",
-						"link": "https://www.cnblogs.com/"
-					},
-					{
-						"title": "码云",
-						"link": "https://gitee.com/"
-					},{
-						"title":"慕课网",
-						"link": "https://www.imooc.com/"
-					},{
-						"title":"腾讯课堂",
-						"link": "https://ke.qq.com/"
-					},{
-						"title":"网易课堂",
-						"link": "https://study.163.com/"
-					},{
-						"title":"牛客网",
-						"link": "https://www.nowcoder.com/"
-					},{
-						"title":"掘金",
-						"link": "https://juejin.im"
-					},{
-						"title":"W3Cschool",
-						"link": "https://www.w3cschool.cn"
-					},{
-						"title":"智联招聘",
-						"link": "https://www.zhaopin.com"
-					},{
-						"title":"前程无忧",
-						"link": "https://www.51job.com"
-					},{
-						"title":"拉勾网",
-						"link": "https://www.lagou.com"
-					},{
-						"title":"中华英才",
-						"link": "https://www.chinahr.com/"
-					},{
-						"title":"Boos直聘",
-						"link": "https://www.zhipin.com"
-					},{
-						"title":"LeetCode(面试题)",
-						"link": "https://leetcode-cn.com"
-					}
-				]
+				blog:{
+					blogs:[
+						{
+							blog:{
+								url:"blog/1",
+								date:"2020.10.10",
+								title:"这是一篇博客",
+								describe:"急啊卡省的JFK大家看法角度看看到JFK的降幅扩大解放卡洛斯酒店房卡大家是否啊可是大家饭卡上的飞机"
+							},
+							blogClass:"日志",
+							blogTag:["java","python","人生"]
+						},{
+							blog:{
+								url:"blog/2",
+								date:"2020.10.11",
+								title:"这是一篇博d第三方客",
+								describe:"急啊卡省的啊啊JFK大阿斯顿发放家看法角度看看到JFK的降幅扩大解放卡洛斯酒店房卡大家是否啊可是大家饭卡上的飞机"
+							},
+							blogClass:"日志1",
+							blogTag:["java1","python1","人生1"]
+						}
+					],
+					blogTags:["java","python","人生","java1","python1","人生1"],
+					blogClass:["日志","日志1"]
+				},
+				thisTag:[],
+				thisBlogs:[]
             }
-        },
+        }
+		,
+		mounted(){
+			this.thisTag = this.blog.blogClass
+		},
         methods: {
-			clickTitle :function(href){
-                window.open(href, '_blank');
+			onTag(tag){
+				this.activeName = tag	
+			},
+			handleClick(tab, event) {
+				if(tab.name == "tag"){
+					this.thisTag = this.blog.blogTags
+				}else if(tab.name == "class"){
+					this.thisTag = this.blog.blogClass
+				}else{
+					this.thisBlogs = this.blog.blogs
+				}
 			}
         }
+	
+		
+		// date .getYear() date .getMonth() date .getDate()
 	})
-	var i = Date.parse(new Date())
-	$.ajax({
-		type: "get",
-		url: "https://www.jnnvc.com/gy.md?i="+i,
-		async: true,
-		dataType: "text",
-		success: function (result) {
-			v.gyHtml = marked(result);
-		}
-	});
-	$.ajax({
-		type: "get",
-		url: "https://www.jnnvc.com/hd.md?i="+i,
-		async: true,
-		dataType: "text",
-		success: function (result) {
-			v.hdHtml = marked(result);
-		}
-	});
+	var d = new Date()
+	s = d.getYear() + "" + d.getDate() + "" + d.getMonth();
+
 	
 	$.ajax({
 		type: "get",
-		url: "https://www.jnnvc.com/qd.md?i="+i,
+		url: "https://www.jnnvc.com/data.json?s="+s,
 		async: true,
-		dataType: "text",
+		dataType: "json",
 		success: function (result) {
-			v.qdHtml = marked(result);
-		}
-	});
-	$.ajax({
-		type: "get",
-		url: "https://www.jnnvc.com/gj.md?i="+i,
-		async: true,
-		dataType: "text",
-		success: function (result) {
-			v.gjHtml = marked(result);
+			v.gyHtml = marked(result);
 		}
 	});
 </script>
